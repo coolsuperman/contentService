@@ -37,13 +37,13 @@ func GetMysqlInstance() *MysqlHelper {
 		}
 
 		// SetMaxIdleConns 设置空闲连接池中连接的最大数量
-		sqlDB.SetMaxIdleConns(16)
+		sqlDB.SetMaxIdleConns(config.Config.Mysql.MaxIdleConns)
 
 		// SetMaxOpenConns 设置打开数据库连接的最大数量。
-		sqlDB.SetMaxOpenConns(256)
+		sqlDB.SetMaxOpenConns(config.Config.Mysql.MaxOpenConns)
 
 		// SetConnMaxLifetime 设置了连接可复用的最大时间。
-		sqlDB.SetConnMaxLifetime(time.Hour)
+		sqlDB.SetConnMaxLifetime(time.Duration(config.Config.Mysql.ConnMaxLifetime * time.Second.Microseconds()))
 	})
 
 	return dbClient

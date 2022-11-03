@@ -29,7 +29,10 @@ type config struct {
 		DB     int    `yaml:"db"`
 	}
 	Mysql struct {
-		Mysql string `yaml:"mysql"`
+		Mysql           string `yaml:"mysql"`
+		MaxIdleConns    int    `yaml:"maxIdleConns"`
+		MaxOpenConns    int    `yaml:"maxOpenConns"`
+		ConnMaxLifetime int64  `yaml:"connMaxLifetime"`
 	}
 }
 

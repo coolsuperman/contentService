@@ -10,3 +10,6 @@ redis:
   passwd: 1998527q
 mysql:
   mysql: root:123456@tcp(127.0.0.1:13306)/test?charset=utf8mb4&parseTime=True&loc=Local
+  maxIdleConns: 16
+  maxOpenConns: 256
+  connMaxLifetime: 3600
