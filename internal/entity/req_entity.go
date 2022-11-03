@@ -9,11 +9,6 @@ type AddContentReq struct {
 	Tag         int64  `json:"tag"`
 }
 
-type OperateContentReq struct {
-	ErrCode int64  `json:"err_code"`
-	ErrMsg  string `json:"err_msg"`
-}
-
 type GetContentListReq struct {
 	Tag    int64 `form:"tag"`
 	Status int64 `form:"status"`

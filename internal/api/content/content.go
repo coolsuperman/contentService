@@ -14,8 +14,8 @@ import (
 
 //添加文章
 func AddContent(c *gin.Context) {
-	var req content.AddContentReq
-	err := c.ShouldBindJSON(&req)
+	var tmpReq entity.AddContentReq
+	err := c.ShouldBindJSON(&tmpReq)
 	if err != nil {
 		HttpFailResp(c, http.StatusForbidden, "params err", 1000, nil)
 		return
@@ -28,6 +28,16 @@ func AddContent(c *gin.Context) {
 		panic("can not connect: rpc server" + err.Error())
 	}
 	manager := content.NewContentManagerClient(client.Conn())
+	req := content.AddContentReq{
+		Content: &content.ContentDetail{
+			Title:       tmpReq.Title,
+			HeadPhoto:   tmpReq.HeadPhoto,
+			AuthorID:    tmpReq.AuthorID,
+			Description: tmpReq.Description,
+			Name:        tmpReq.Name,
+			Tag:         tmpReq.Tag,
+		},
+	}
 	RpcResp, err := manager.AddContent(context.Background(), &req)
 	if err != nil {
 		HttpFailResp(c, http.StatusInternalServerError, "call add AddContent rpc server failed", 1001, nil)
