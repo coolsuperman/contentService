@@ -1,0 +1,20 @@
+CREATE TABLE `content` (
+    `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `content_id` VARCHAR(32) NOT NULL COMMENT '我们自己的UUID',
+    `author_id` VARCHAR(64) NOT NULL DEFAULT '' COMMENT '作者ID',
+    `tag` BIGINT  UNSIGNED NOT NULL DEFAULT  '0' COMMENT'分类(按位与支持多tag)',
+    `status` TINYINT(4)  UNSIGNED NOT NULL DEFAULT  '0' COMMENT'0 待发布 1 审核中 2 审核成功 3审核失败 4 已发布 5 已删除',
+    `title` VARCHAR(128) NOT NULL DEFAULT '' COMMENT'标题',
+    `name` VARCHAR(128) NOT NULL DEFAULT '' COMMENT'文章名称',
+    `create_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `head_photo` TEXT NOT NULL  COMMENT '头图(封面)地址',
+    `description` TEXT NOT NULL  COMMENT '文章描述',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `content_id` (`content_id`),
+    KEY `title` (`title`),
+    KEY `tag` (`tag`),
+    KEY `author_id` (`author_id`),
+    KEY `update_time` (`update_time`),
+    KEY `create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='文章表'

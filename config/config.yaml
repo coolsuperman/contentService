@@ -1,0 +1,12 @@
+api:
+  apiPort: 1998 #api服务端口
+  listenIP: 0.0.0.0
+rpc:
+  rpcPort: 19980 #rpc服务端口
+  listenIP: 0.0.0.0
+redis:
+  host: localhost:16379
+  db: 0
+  passwd: 1998527q
+mysql:
+  mysql: root:123456@tcp(127.0.0.1:13306)/test?charset=utf8mb4&parseTime=True&loc=Local

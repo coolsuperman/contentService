@@ -1,0 +1,79 @@
+syntax = "proto3";
+
+package content;
+
+option go_package = "./content";
+
+message Content {
+  string title = 1;
+  string headPhoto = 2;
+  string  contentID = 3;
+  string name = 4;
+  string authorID = 5;
+  int64  tag = 6;
+}
+
+message ContentDetail{
+  string title = 1;
+  string headPhoto = 2;
+  int64  status = 3;
+  string  addTime = 4;
+  string  updateTime = 5;
+  string  contentID = 6;
+  string authorID = 7;
+  string description = 8;
+  string name = 9;
+  int64  tag = 10;
+}
+
+//获取文章列表
+message GetContentListReq {
+  int64 tag = 1;
+  int64 start = 2;
+  int64 stop = 3;
+  int64 status = 4;
+}
+
+message GetContentListResp {
+  repeated Content list = 1;
+}
+
+//获取文章详情
+message GetContentDetailReq {
+  string contentID = 1;
+}
+
+message GetContentDetailResp{
+  ContentDetail content = 1;
+}
+
+//添加创建文章
+message AddContentReq{
+  ContentDetail content = 1;
+}
+
+message AddContentResp{
+  int64 errCode = 1;
+  string contentID = 2;
+  string errMsg = 3;
+}
+
+//操作文章（删除，审核通过，审核失败）
+message OperateContentReq {
+  string action = 1;
+  string comment = 2;
+  string contentID = 3;
+}
+
+message OperateContentResp {
+  int64 errCode = 1;
+  string errMsg = 2;
+}
+
+service ContentManager {
+  //content operation
+  rpc GetContentLit(GetContentListReq) returns (GetContentListResp);
+  rpc OperateContent(OperateContentReq) returns (OperateContentResp);
+  rpc GetContentDetail(GetContentDetailReq) returns (GetContentDetailResp);
+  rpc AddContent(AddContentReq) returns (AddContentResp);
+}
