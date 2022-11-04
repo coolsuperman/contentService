@@ -11,7 +11,7 @@
     * 通过gorm以及绑定参数的方式规避sql注入
     * 核心业务逻辑已完成单元测试
 ## 改进
-  * 已将rpc服务的mysql/redis manager由饿汉改为懒汉模式，规避初始化时无法监测连接状态
+  * 已将rpc服务的mysql/redis manager由懒汉改为饿汉模式，规避初始化时无法监测连接状态
   * rpc与api服务均引入wire进行了DI改造，避免了全局变量的使用
   * 通过cobra对rpc和api进行二级命令整合
   * 配置统一从yaml文件导入，不再部分写死在代码中
