@@ -2,6 +2,7 @@ package datamanager
 
 import (
 	"contentService/pkg/config"
+	"fmt"
 	"sync"
 	"time"
 
@@ -34,6 +35,23 @@ func GetRedisInstance() *RedisHelper {
 	})
 
 	return client
+}
+
+func NewRedisHelper(conf config.GConfig) (*RedisHelper, func(), error) {
+	client = &RedisHelper{}
+	addr := conf.Redis.Host
+	db := conf.Redis.DB
+	passwd := conf.Redis.Passwd
+	if addr == "" {
+		return nil, func() {}, fmt.Errorf("Init redis fail")
+	}
+
+	client.Db = redis.NewClient(&redis.Options{
+		Addr:     addr,
+		Password: passwd,
+		DB:       db,
+	})
+	return client, func() {}, nil
 }
 
 func (r *RedisHelper) HSet(key, field string, value interface{}) (bool, error) {

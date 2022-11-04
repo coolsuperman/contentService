@@ -13,5 +13,6 @@ func wireApi() (*api.Api, func(), error) {
 	panic(wire.Build(
 		config.NewGConfig,
 		api.ProviderApiSet,
+		api.NewApi,
 	))
 }

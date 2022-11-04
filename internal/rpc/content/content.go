@@ -16,24 +16,26 @@ import (
 	"time"
 )
 
-type rpcContent struct {
+type RpcContent struct {
 	content.UnimplementedContentManagerServer
-	rpcPort     int
-	rpcListenIP string
+	rpcPort       int
+	rpcListenIP   string
+	mysqlInstance *datamanager.MysqlHelper
+	redisInstance *datamanager.RedisHelper
 }
 
-func (rpc *rpcContent) GetContentListRK() string {
+func (rpc *RpcContent) GetContentListRK() string {
 	return "content:list:kv"
 }
 
-func (rpc *rpcContent) GetContentInfoRK(contentID string) string {
+func (rpc *RpcContent) GetContentInfoRK(contentID string) string {
 	return fmt.Sprintf("content:info:kv:%s", contentID)
 }
 
-func (rpc *rpcContent) GetContentLit(_ context.Context, req *content.GetContentListReq) (resp *content.GetContentListResp, err error) {
+func (rpc *RpcContent) GetContentLit(_ context.Context, req *content.GetContentListReq) (resp *content.GetContentListResp, err error) {
 	//缓存第一页，因为文章信息更改对文章列表信息的实时要求不高且大量用户基本停留在第一页，所以可以把第一页缓存个30秒
 	resp = &content.GetContentListResp{}
-	list, err := datamanager.GetRedisInstance().Get(rpc.GetContentListRK())
+	list, err := rpc.redisInstance.Get(rpc.GetContentListRK())
 	if list != "" && err == nil {
 		var ret []entity.BaseContent
 		err = json.Unmarshal([]byte(list), &ret)
@@ -52,7 +54,7 @@ func (rpc *rpcContent) GetContentLit(_ context.Context, req *content.GetContentL
 		}
 		return
 	}
-	ret, err := datamanager.GetMysqlInstance().GetContentListByTag(int(req.Stop-req.Start)+1, int(req.Start), int(req.Tag), int(req.Status))
+	ret, err := rpc.mysqlInstance.GetContentListByTag(int(req.Stop-req.Start)+1, int(req.Start), int(req.Tag), int(req.Status))
 	if err != nil {
 		return nil, err
 	}
@@ -68,14 +70,14 @@ func (rpc *rpcContent) GetContentLit(_ context.Context, req *content.GetContentL
 	}
 	jsonStr, err := json.Marshal(ret)
 	if err == nil {
-		datamanager.GetRedisInstance().SetNX(rpc.GetContentListRK(), string(jsonStr), 30*time.Second)
+		rpc.redisInstance.SetNX(rpc.GetContentListRK(), string(jsonStr), 30*time.Second)
 	}
 	return
 }
 
-func (rpc *rpcContent) GetContentDetail(_ context.Context, req *content.GetContentDetailReq) (resp *content.GetContentDetailResp, err error) {
+func (rpc *RpcContent) GetContentDetail(_ context.Context, req *content.GetContentDetailReq) (resp *content.GetContentDetailResp, err error) {
 	//给详情页加个redis 缓存，每次更新的时候删除缓存，然后懒加载
-	ret, err := datamanager.GetRedisInstance().Get(rpc.GetContentInfoRK(req.ContentID))
+	ret, err := rpc.redisInstance.Get(rpc.GetContentInfoRK(req.ContentID))
 	var data *entity.Content
 	if err == nil && ret != "" {
 		data = &entity.Content{}
@@ -83,10 +85,10 @@ func (rpc *rpcContent) GetContentDetail(_ context.Context, req *content.GetConte
 	} else {
 		//从mysql取
 		err = nil
-		data, err = datamanager.GetMysqlInstance().GetContentDetail(req.GetContentID())
+		data, err = rpc.mysqlInstance.GetContentDetail(req.GetContentID())
 		if err == nil {
 			str, _ := json.Marshal(data)
-			datamanager.GetRedisInstance().SetNX(rpc.GetContentInfoRK(req.ContentID), string(str), 12*time.Hour)
+			rpc.redisInstance.SetNX(rpc.GetContentInfoRK(req.ContentID), string(str), 12*time.Hour)
 		}
 	}
 	if data != nil {
@@ -107,9 +109,9 @@ func (rpc *rpcContent) GetContentDetail(_ context.Context, req *content.GetConte
 	}
 	return
 }
-func (rpc *rpcContent) AddContent(_ context.Context, req *content.AddContentReq) (*content.AddContentResp, error) {
+func (rpc *RpcContent) AddContent(_ context.Context, req *content.AddContentReq) (*content.AddContentResp, error) {
 	uuID := strings.ReplaceAll(uuid.New().String(), "-", "")
-	err := datamanager.GetMysqlInstance().InsertContent(entity.Content{
+	err := rpc.mysqlInstance.InsertContent(entity.Content{
 		Title:       req.Content.Title,
 		Tag:         req.Content.Tag,
 		HeadPhoto:   req.Content.HeadPhoto,
@@ -135,15 +137,15 @@ func (rpc *rpcContent) AddContent(_ context.Context, req *content.AddContentReq)
 	}, nil
 }
 
-func (rpc *rpcContent) OperateContent(_ context.Context, req *content.OperateContentReq) (resp *content.OperateContentResp, err error) {
+func (rpc *RpcContent) OperateContent(_ context.Context, req *content.OperateContentReq) (resp *content.OperateContentResp, err error) {
 	switch req.Action {
 	case "del":
-		err = datamanager.GetMysqlInstance().UpdateContent(req.ContentID, entity.Content{
+		err = rpc.mysqlInstance.UpdateContent(req.ContentID, entity.Content{
 			Status: 5,
 		})
 	}
 	//清除缓存
-	datamanager.GetRedisInstance().Del(rpc.GetContentInfoRK(req.ContentID))
+	rpc.redisInstance.Del(rpc.GetContentInfoRK(req.ContentID))
 	if err == nil {
 		resp = &content.OperateContentResp{
 			ErrCode: 200,
@@ -153,14 +155,16 @@ func (rpc *rpcContent) OperateContent(_ context.Context, req *content.OperateCon
 	return
 }
 
-func NewRpcContentServer(port int, addr string) *rpcContent {
-	return &rpcContent{
-		rpcPort:     port,
-		rpcListenIP: addr,
+func NewRpcContentServer(port int, addr string, mysqlClient *datamanager.MysqlHelper, redisClient *datamanager.RedisHelper) *RpcContent {
+	return &RpcContent{
+		rpcPort:       port,
+		rpcListenIP:   addr,
+		mysqlInstance: mysqlClient,
+		redisInstance: redisClient,
 	}
 }
 
-func (rpc *rpcContent) Run() {
+func (rpc *RpcContent) Run() {
 	address := rpc.rpcListenIP + ":" + strconv.Itoa(rpc.rpcPort)
 	listener, err := net.Listen("tcp", address)
 	if err != nil {

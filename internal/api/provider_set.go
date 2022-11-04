@@ -6,4 +6,4 @@ import (
 	"github.com/google/wire"
 )
 
-var ProviderApiSet = wire.NewSet(NewApi, conn.NewRpcConnClient, content.NewApiContent)
+var ProviderApiSet = wire.NewSet(conn.NewRpcConnClient, content.NewApiContent)

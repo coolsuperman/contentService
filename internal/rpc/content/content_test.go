@@ -12,7 +12,7 @@ import (
 )
 
 func TestRpcContent_AddContent(t *testing.T) {
-	handler := rpcContent{}
+	handler := RpcContent{}
 	fmt.Println(strings.ReplaceAll(uuid.New().String(), "-", ""))
 	ret, err := handler.AddContent(context.Background(), &content.AddContentReq{
 		Content: &content.ContentDetail{
@@ -30,7 +30,7 @@ func TestRpcContent_AddContent(t *testing.T) {
 }
 
 func TestRpcContent_GetContentDetail(t *testing.T) {
-	handler := rpcContent{}
+	handler := RpcContent{}
 	ret, err := handler.GetContentDetail(context.Background(), &content.GetContentDetailReq{
 		ContentID: "845d2b1168964df8860a6ccb5a511184",
 	})
@@ -38,7 +38,7 @@ func TestRpcContent_GetContentDetail(t *testing.T) {
 }
 
 func TestRpcContent_GetContentLit(t *testing.T) {
-	handler := rpcContent{}
+	handler := RpcContent{}
 	ret, err := handler.GetContentLit(context.Background(), &content.GetContentListReq{
 		Tag:    1,
 		Start:  0,
@@ -49,7 +49,7 @@ func TestRpcContent_GetContentLit(t *testing.T) {
 }
 
 func TestRpcContent_OperateContent(t *testing.T) {
-	handler := rpcContent{}
+	handler := RpcContent{}
 	ret, err := handler.OperateContent(context.Background(), &content.OperateContentReq{
 		Action:    "del",
 		Comment:   "删除",
