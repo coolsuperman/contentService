@@ -2,6 +2,7 @@ package main
 
 import (
 	"contentService/cmd/api"
+	"contentService/cmd/rpc"
 	"github.com/spf13/cobra"
 	"log"
 )
@@ -14,6 +15,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(api.ApiCmd)
+	rootCmd.AddCommand(rpc.RpcCmd)
 }
 
 func main() {
