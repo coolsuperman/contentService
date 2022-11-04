@@ -1,4 +1,4 @@
-package api
+package rpc
 
 import (
 	"contentService/internal/rpc/content"
