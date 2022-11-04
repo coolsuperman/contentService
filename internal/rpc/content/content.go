@@ -146,7 +146,7 @@ func (rpc *rpcContent) OperateContent(_ context.Context, req *content.OperateCon
 	datamanager.GetRedisInstance().Del(rpc.GetContentInfoRK(req.ContentID))
 	if err == nil {
 		resp = &content.OperateContentResp{
-			ErrCode: 0,
+			ErrCode: 200,
 			ErrMsg:  "",
 		}
 	}

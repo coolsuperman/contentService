@@ -144,7 +144,7 @@ func HttpSuccessResp(ctx *gin.Context, httpCode int, msg string, data interface{
 	resp := entity.HttpResponseObject{
 		Status:  entity.HttpSuccessful,
 		Message: msg,
-		ErrCode: 0,
+		ErrCode: 200,
 		Data:    data,
 	}
 
