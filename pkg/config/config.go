@@ -12,9 +12,9 @@ var (
 	Root       = filepath.Join(filepath.Dir(b), "../..")
 )
 
-var Config config
+var Config GConfig
 
-type config struct {
+type GConfig struct {
 	Api struct {
 		GinPort  int    `yaml:"apiPort"`
 		ListenIP string `yaml:"listenIP"`
@@ -34,6 +34,10 @@ type config struct {
 		MaxOpenConns    int    `yaml:"maxOpenConns"`
 		ConnMaxLifetime int64  `yaml:"connMaxLifetime"`
 	}
+}
+
+func NewGConfig() GConfig {
+	return Config
 }
 
 func init() {
