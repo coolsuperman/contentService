@@ -12,8 +12,8 @@
     * 核心业务逻辑已完成单元测试
 ## 改进
   * 已将rpc服务的mysql/redis manager由饿汉改为懒汉模式，规避初始化时无法监测连接状态
-  * rpc与api服务均引入wire进行了DI改造，
-  * 通过cobra对rpc和api进行二级命令整合，避免了全局变量的使用
+  * rpc与api服务均引入wire进行了DI改造，避免了全局变量的使用
+  * 通过cobra对rpc和api进行二级命令整合
   * 配置统一从yaml文件导入，不再部分写死在代码中
   * 清除了未使用的消息题
   * gin绑定时不再直接使用pb struct
