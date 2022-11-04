@@ -12,8 +12,6 @@ var (
 	Root       = filepath.Join(filepath.Dir(b), "../..")
 )
 
-var Config GConfig
-
 type GConfig struct {
 	Api struct {
 		GinPort  int    `yaml:"apiPort"`
@@ -37,10 +35,7 @@ type GConfig struct {
 }
 
 func NewGConfig() GConfig {
-	return Config
-}
-
-func init() {
+	var Config GConfig
 	bytes, err := ioutil.ReadFile(filepath.Join(Root, "config", "config.yaml"))
 	if err != nil {
 		panic(err.Error())
@@ -48,4 +43,5 @@ func init() {
 	if err = yaml.Unmarshal(bytes, &Config); err != nil {
 		panic(err.Error())
 	}
+	return Config
 }

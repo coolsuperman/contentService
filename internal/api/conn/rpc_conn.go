@@ -14,7 +14,10 @@ func NewRpcConnClient(conf config.GConfig) (*grpc.ClientConn, func(), error) {
 	}
 	client, err := zrpc.NewClient(zConf, zrpc.WithTransportCredentials(credentials.NewClientTLSFromCert(nil, "")))
 	if err != nil {
-		return nil, func() {}, nil
+		return nil, func() {}, err
 	}
-	return client.Conn(), func() {}, nil
+	conn := client.Conn()
+	return conn, func() {
+		_ = conn.Close()
+	}, nil
 }
