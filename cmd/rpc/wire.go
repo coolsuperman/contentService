@@ -13,7 +13,7 @@ import (
 func wireRpc() (*rpc.Rpc, func(), error) {
 	panic(wire.Build(
 		config.NewGConfig,
-		datamanager.ProviderRpcSet,
+		datamanager.ProviderDataManagerSet,
 		rpc.NewRpc,
 	))
 }
